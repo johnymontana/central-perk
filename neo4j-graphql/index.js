@@ -2,6 +2,8 @@ const { makeAugmentedSchema, cypher } = require("neo4j-graphql-js");
 const { ApolloServer } = require("apollo-server");
 const neo4j = require("neo4j-driver");
 
+require('dotenv').config()
+
 const typeDefs = /* GraphQL */ `
 
   type Step {
@@ -9,14 +11,20 @@ const typeDefs = /* GraphQL */ `
       longitude: Float
   }
 
+  type Tag {
+    key: String
+    value: String
+  }
+
   type PointOfInterest {
     name: String
     location: Point
     type: String
-    node_osm_id: Int
-    tags: [String] @cypher(statement: """ 
-    MATCH (this)-[:TAGS]->(t:OSMTags)
-    RETURN keys(t)
+    node_osm_id: ID!
+    tags: [Tag] @cypher(statement: """ 
+    MATCH (this)-->(t:OSMTags)
+    UNWIND keys(t) AS key
+    RETURN {key: key, value: t[key]} AS tag
     """)
     routeToPOI(poi: Int!): [Step] @cypher(${cypher`
     MATCH (other:PointOfInterest {node_osm_id: $poi})
@@ -30,8 +38,8 @@ const typeDefs = /* GraphQL */ `
 const schema = makeAugmentedSchema({ typeDefs });
 
 const driver = neo4j.driver(
-  "bolt://100.26.227.192:35550",
-  neo4j.auth.basic("neo4j", "radius-capacitances-spoon")
+  process.env.NEO4J_URI,
+  neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PASSWORD)
 );
 
 const server = new ApolloServer({ schema, context: { driver } });

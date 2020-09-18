@@ -7,15 +7,15 @@ import SEO from "../components/seo"
 import { rhythm, scale } from "../utils/typography"
 
 const BlogPostTemplate = ({ data, pageContext, location }) => {
-  const post = data.markdownRemark
+  const post = data.poi.PointOfInterest[0]
   const siteTitle = data.site.siteMetadata.title
   const { previous, next } = pageContext
 
   return (
     <Layout location={location} title={siteTitle}>
       <SEO
-        title={post.frontmatter.title}
-        description={post.frontmatter.description || post.excerpt}
+        title={post.name}
+        description={post.type}
       />
       <article>
         <header>
@@ -25,7 +25,7 @@ const BlogPostTemplate = ({ data, pageContext, location }) => {
               marginBottom: 0,
             }}
           >
-            {post.frontmatter.title}
+            {post.name}
           </h1>
           <p
             style={{
@@ -34,10 +34,16 @@ const BlogPostTemplate = ({ data, pageContext, location }) => {
               marginBottom: rhythm(1),
             }}
           >
-            {post.frontmatter.date}
+            {post.node_osm_id}
           </p>
         </header>
-        <section dangerouslySetInnerHTML={{ __html: post.html }} />
+      <p>
+        <ul>
+          {post.tags?.map( (t,i) => {
+            return <li key={i}><strong>{t.key}</strong>: {t.value}</li>
+          })}
+        </ul>
+      </p>
         <hr
           style={{
             marginBottom: rhythm(1),
@@ -60,15 +66,15 @@ const BlogPostTemplate = ({ data, pageContext, location }) => {
         >
           <li>
             {previous && (
-              <Link to={previous.fields.slug} rel="prev">
-                ← {previous.frontmatter.title}
+              <Link to={`/` + previous.node_osm_id} rel="prev">
+                ← {previous.name}
               </Link>
             )}
           </li>
           <li>
             {next && (
-              <Link to={next.fields.slug} rel="next">
-                {next.frontmatter.title} →
+              <Link to={`/` + next.node_osm_id} rel="next">
+                {next.name} →
               </Link>
             )}
           </li>
@@ -81,21 +87,25 @@ const BlogPostTemplate = ({ data, pageContext, location }) => {
 export default BlogPostTemplate
 
 export const pageQuery = graphql`
-  query BlogPostBySlug($slug: String!) {
-    site {
-      siteMetadata {
-        title
-      }
-    }
-    markdownRemark(fields: { slug: { eq: $slug } }) {
-      id
-      excerpt(pruneLength: 160)
-      html
-      frontmatter {
-        title
-        date(formatString: "MMMM DD, YYYY")
-        description
-      }
+  query POIBySlug($slug: ID!) {
+  site {
+    siteMetadata {
+      title
     }
   }
+  poi {
+    PointOfInterest(node_osm_id: $slug) {
+      name
+      location {
+        latitude
+        longitude
+      }
+      tags {
+        key
+        value
+      }
+      type
+    }
+  }
+}
 `
