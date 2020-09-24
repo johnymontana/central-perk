@@ -36,6 +36,7 @@ const BlogPostTemplate = ({ data, pageContext, location }) => {
           >
             {post.node_osm_id}
           </p>
+          <img src={post.photos[0]} />
         </header>
       <p>
         <ul>
@@ -44,6 +45,10 @@ const BlogPostTemplate = ({ data, pageContext, location }) => {
           })}
         </ul>
       </p>
+      <div 
+        dangerouslySetInnerHTML={{__html: post.wikipedia}}
+      
+      />
         <hr
           style={{
             marginBottom: rhythm(1),
@@ -100,6 +105,8 @@ export const pageQuery = graphql`
         latitude
         longitude
       }
+      photos(first: 1, radius: 200)
+      wikipedia
       tags {
         key
         value
