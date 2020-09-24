@@ -27,6 +27,7 @@ const BlogPostTemplate = ({ data, pageContext, location }) => {
           >
             {post.name}
           </h1>
+          <img src={post.photos[0]} alt={`Photo of ${post.name}`} />
           <p
             style={{
               ...scale(-1 / 5),
@@ -44,6 +45,7 @@ const BlogPostTemplate = ({ data, pageContext, location }) => {
           })}
         </ul>
       </p>
+      <div dangerouslySetInnerHTML={{__html: post.wikipedia}} />
         <hr
           style={{
             marginBottom: rhythm(1),
@@ -96,6 +98,8 @@ export const pageQuery = graphql`
   poi {
     PointOfInterest(node_osm_id: $slug) {
       name
+      photos(first: 1)
+      wikipedia
       location {
         latitude
         longitude
