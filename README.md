@@ -12,3 +12,4 @@ This app is being built during a series of livestreams. You can tune in live Thu
 * [**Part 2:** - Using GraphQL With Gatsby](https://www.youtube.com/watch?v=XCuknJAIX84)
 * [**Part 3:** - Adding Images From Mapillary & Wikipedia Data](https://www.youtube.com/watch?v=_DBVYEgr73E)
 * [**Part 4:** - Efficient Routing With Graph Algorithms](https://www.youtube.com/watch?v=MvjhSDsai9U&list=PL9Hl4pk2FsvUza4kdPSKQrcl3MGGutOe2&index=4)
+* [**Part 5:** - DigitalOcean App Platform Deployment](https://www.youtube.com/watch?v=SIDwj4mfbVQ&list=PL9Hl4pk2FsvUza4kdPSKQrcl3MGGutOe2&index=5)
