@@ -1,5 +1,9 @@
-import React from "react"
+import React, {useState} from "react"
 import { Link, graphql } from "gatsby"
+
+import MapGL, {Popup, Marker} from '@urbica/react-map-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+
 
 import Bio from "../components/bio"
 import Layout from "../components/layout"
@@ -10,10 +14,73 @@ const BlogIndex = ({ data, location }) => {
   const siteTitle = data.site.siteMetadata.title
   const posts = data.poi.PointOfInterest
 
+  const [viewport, setViewport] = useState({
+    latitude: 40.7812,
+    longitude: -73.9665,
+    zoom: 13
+  });
+
+  const [showPopup, setShowPopup] = useState(null)
+
   return (
     <Layout location={location} title={siteTitle}>
       <SEO title="All posts" />
       <Bio />
+      <MapGL
+        style={{ width: '100%', height: '600px' }}
+        mapStyle='mapbox://styles/mapbox/light-v9'
+        accessToken={process.env.GATSBY_MAPBOX_KEY}
+        latitude={viewport.latitude}
+        longitude={viewport.longitude}
+        zoom={viewport.zoom}
+        onViewportChange={setViewport}
+      >
+        {posts.map( (poi, i) => {
+          return (
+          <Marker key={i} longitude={poi.location.longitude} latitude={poi.location.latitude}>
+          <svg
+            height={10}
+            viewBox="0 0 24 24"
+            style={{
+              cursor: 'pointer',
+              fill: '#d00',
+              stroke: 'none',
+              transform: `translate(${-10 / 2}px,${-10}px)`
+            }}
+            onClick={() => {setShowPopup(poi)}}
+          >
+              <path d="M20.2,15.7L20.2,15.7c1.1-1.6,1.8-3.6,1.8-5.7c0-5.6-4.5-10-10-10S2,4.5,2,10c0,2,0.6,3.9,1.6,5.4c0,0.1,0.1,0.2,0.2,0.3
+  c0,0,0.1,0.1,0.1,0.2c0.2,0.3,0.4,0.6,0.7,0.9c2.6,3.1,7.4,7.6,7.4,7.6s4.8-4.5,7.4-7.5c0.2-0.3,0.5-0.6,0.7-0.9
+  C20.1,15.8,20.2,15.8,20.2,15.7z" />
+            </svg>
+          </Marker>
+          )
+        })}
+        
+        {showPopup && (
+        <Popup
+          tipSize={5}
+          anchor="top"
+          longitude={showPopup.location.longitude}
+          latitude={showPopup.location.latitude}
+          closeOnClick={false}
+          onClose={() => setShowPopup(null)}
+        >
+          <div>
+            <div>
+              <strong>{showPopup.name}</strong> ({showPopup.type}) |{' '}
+              <a
+                target="_new"
+                href={`/${showPopup.node_osm_id}`}
+              >
+                Details
+              </a>
+            </div>
+            <img width={240} src={showPopup.photos[0]} />
+          </div>
+        </Popup>
+      )   }
+  </MapGL>
       {posts.map( (node) => {
         const title = node.name
         return (
@@ -52,6 +119,7 @@ export const pageQuery = graphql`
       node_osm_id
       name
       type
+      photos(first: 1)
       location {
         latitude
         longitude
