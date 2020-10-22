@@ -20,6 +20,12 @@ module.exports = {
       },
     },
     {
+      resolve: 'gatsby-plugin-apollo',
+      options: {
+        uri: 'http://localhost:3003'
+      }
+    },
+    {
       resolve: `gatsby-source-filesystem`,
       options: {
         path: `${__dirname}/content/assets`,
